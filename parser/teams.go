@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-crawler/common"
 	"go-crawler/engine"
+	"log"
 	"sort"
 	"strconv"
 )
@@ -87,21 +88,23 @@ func parseTeams(content []byte, ctx engine.Context) engine.ParseResult {
 	result := engine.ParseResult{Result: nba}
 
 	linkFormat := ctx[linkFormatKey].(string)
-
-	for _, v := range nba.East.Total {
+	log.Println("East:")
+	for i, v := range nba.East.Total {
 		v.Link = fmt.Sprintf(linkFormat, v.TeamId)
 		result.Requests = append(result.Requests, engine.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
+		log.Printf("%d %v\n", i, v)
 	}
-
-	for _, v := range nba.West.Total {
+	log.Println("West:")
+	for i, v := range nba.West.Total {
 		v.Link = fmt.Sprintf(linkFormat, v.TeamId)
 		result.Requests = append(result.Requests, engine.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
+		log.Printf("%d %v\n", i, v)
 	}
 
 	return result
