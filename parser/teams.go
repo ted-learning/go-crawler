@@ -11,19 +11,19 @@ import (
 
 type JsonNBA struct {
 	//Rank
-	East JsonTeams `json:"east"`
-	West JsonTeams `json:"west"`
+	East []JsonTeam `json:"east"`
+	West []JsonTeam `json:"west"`
 	//East
-	EastSouth JsonTeams `json:"eastsouth"`
-	Atlantic  JsonTeams `json:"atlantic"`
-	Central   JsonTeams `json:"central"`
+	EastSouth []JsonTeam `json:"eastsouth"`
+	Atlantic  []JsonTeam `json:"atlantic"`
+	Central   []JsonTeam `json:"central"`
 	//West
-	Pacific   JsonTeams `json:"pacific"`
-	WestSouth JsonTeams `json:"westsouth"`
-	WestNorth JsonTeams `json:"westnorth"`
+	Pacific   []JsonTeam `json:"pacific"`
+	WestSouth []JsonTeam `json:"westsouth"`
+	WestNorth []JsonTeam `json:"westnorth"`
 }
 
-type JsonTeams []JsonTeam
+//type JsonTeams []JsonTeam
 
 type JsonTeam struct {
 	Badge            string `json:"badge"`
@@ -71,46 +71,44 @@ func parseTeams(content []byte, ctx engine.Context) engine.ParseResult {
 	jsonNBA := parseJson(content)
 	nba := NBA{
 		East: East{
-			EastSouth: jsonNBA.EastSouth.convertToTeam(), //东南赛区
-			Central:   jsonNBA.Central.convertToTeam(),   //中部赛区
-			Atlantic:  jsonNBA.Atlantic.convertToTeam(),  //大西洋赛区
-			Total:     jsonNBA.East.convertToTeam(),
+			EastSouth: convertToTeam(&jsonNBA.EastSouth), //东南赛区
+			Central:   convertToTeam(&jsonNBA.Central),   //中部赛区
+			Atlantic:  convertToTeam(&jsonNBA.Atlantic),  //大西洋赛区
+			Total:     convertToTeam(&jsonNBA.East),
 		},
 
 		West: West{
-			Pacific:   jsonNBA.Pacific.convertToTeam(),   //太平洋赛区
-			WestNorth: jsonNBA.WestNorth.convertToTeam(), //西北赛区
-			WestSouth: jsonNBA.WestSouth.convertToTeam(), //西南赛区
-			Total:     jsonNBA.West.convertToTeam(),
+			Pacific:   convertToTeam(&jsonNBA.Pacific),   //太平洋赛区
+			WestNorth: convertToTeam(&jsonNBA.WestNorth), //西北赛区
+			WestSouth: convertToTeam(&jsonNBA.WestSouth), //西南赛区
+			Total:     convertToTeam(&jsonNBA.West),
 		},
 	}
-
 	result := engine.ParseResult{Result: nba}
 
 	linkFormat := ctx[linkFormatKey].(string)
-	for i, v := range nba.East.Total {
+
+	for _, v := range nba.East.Total {
 		v.Link = fmt.Sprintf(linkFormat, v.TeamId)
 		result.Requests = append(result.Requests, engine.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
-		fmt.Printf("%d %v\n", i, v)
 	}
-	for i, v := range nba.West.Total {
+
+	for _, v := range nba.West.Total {
 		v.Link = fmt.Sprintf(linkFormat, v.TeamId)
-		result.Result = append(result.Requests, engine.Request{
+		result.Requests = append(result.Requests, engine.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
-		fmt.Printf("%d %v\n", i, v)
 	}
 
 	return result
 }
 
 func parseJson(content []byte) JsonNBA {
-	fmt.Printf(string(content))
-	tempMap := make([]interface{}, 3)
+	var tempMap []interface{}
 	err := json.Unmarshal(content, &tempMap)
 	common.PanicErr(err)
 
@@ -123,7 +121,7 @@ func parseJson(content []byte) JsonNBA {
 	return jsonNBA
 }
 
-func (source *JsonTeams) convertToTeam() []Team {
+func convertToTeam(source *[]JsonTeam) []Team {
 	target := make([]Team, len(*source))
 	for i, v := range *source {
 		wins, err := strconv.Atoi(v.Wins)

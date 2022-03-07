@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func Fetcher(url string) ([]byte, error) {
@@ -30,9 +31,13 @@ func Fetcher(url string) ([]byte, error) {
 	if response.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("wrong status code: %d", response.StatusCode)
 	}
+
+	if strings.Index(url, ".htm") == -1 {
+		return ioutil.ReadAll(response.Body)
+	}
 	encode := determineEncoding(response.Body)
 	reader := transform.NewReader(response.Body, encode.NewDecoder())
-	return ioutil.ReadAll(bufio.NewReader(reader))
+	return ioutil.ReadAll(reader)
 }
 
 func determineEncoding(reader io.Reader) encoding.Encoding {
@@ -40,7 +45,6 @@ func determineEncoding(reader io.Reader) encoding.Encoding {
 	if err != nil {
 		return unicode.UTF8
 	}
-
 	encode, _, _ := charset.DetermineEncoding(peek, "")
 	return encode
 }

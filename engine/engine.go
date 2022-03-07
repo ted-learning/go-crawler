@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"encoding/json"
+	"go-crawler/common"
 	"go-crawler/fetcher"
 	"log"
 )
@@ -19,7 +21,10 @@ func Run(seeds ...Request) {
 			continue
 		}
 		result := req.ParserFunc(bytes, req.Context)
-		log.Printf("Fetched result: %v\n", result.Result)
+		marshal, err := json.Marshal(result.Result)
+		common.PanicErr(err)
+
+		log.Printf("Fetched result: %s\n", marshal)
 		requests = append(requests, result.Requests...)
 	}
 }
