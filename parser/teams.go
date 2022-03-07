@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-crawler/common"
-	"go-crawler/engine"
 	"log"
 	"sort"
 	"strconv"
@@ -68,7 +67,7 @@ type Team struct {
 
 const teamLinkTemp = "https://matchweb.sports.qq.com/team/players?teamId=%s&competitionId=100000"
 
-func parseTeams(content []byte, _ engine.Context) engine.ParseResult {
+func parseTeams(content []byte, _ common.Context) common.ParseResult {
 	jsonNBA := parseJson(content)
 	nba := NBA{
 		East: East{
@@ -85,12 +84,12 @@ func parseTeams(content []byte, _ engine.Context) engine.ParseResult {
 			Total:     convertToTeam(&jsonNBA.West),
 		},
 	}
-	result := engine.ParseResult{Result: nba}
+	result := common.ParseResult{Result: nba}
 
 	log.Println("East:")
 	for i, v := range nba.East.Total {
 		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
-		result.Requests = append(result.Requests, engine.Request{
+		result.Requests = append(result.Requests, common.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
@@ -99,7 +98,7 @@ func parseTeams(content []byte, _ engine.Context) engine.ParseResult {
 	log.Println("West:")
 	for i, v := range nba.West.Total {
 		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
-		result.Requests = append(result.Requests, engine.Request{
+		result.Requests = append(result.Requests, common.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})

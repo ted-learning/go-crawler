@@ -3,7 +3,6 @@ package parser
 import (
 	"encoding/json"
 	"go-crawler/common"
-	"go-crawler/engine"
 	"strconv"
 )
 
@@ -45,7 +44,7 @@ const (
 	Assist  = "助攻"
 )
 
-func parsePlayers(content []byte, _ engine.Context) engine.ParseResult {
+func parsePlayers(content []byte, _ common.Context) common.ParseResult {
 	response := JsonStatsResponse{}
 	err := json.Unmarshal(content, &response)
 	common.PanicErr(err)
@@ -66,7 +65,7 @@ func parsePlayers(content []byte, _ engine.Context) engine.ParseResult {
 		}
 	}
 
-	return engine.ParseResult{
+	return common.ParseResult{
 		Result: stats,
 	}
 }

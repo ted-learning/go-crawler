@@ -8,8 +8,13 @@ go get -u golang.org/x/text
 go get -u golang.org/x/net/html
 ```
 
-## Flows
+## Simple
 
 main -> engine -> loop(fetcher -> parser)
 
 index -> teams -> rosters -> players
+
+
+## Concurrence
+
+engine -> scheduler -> workers -> engine

@@ -2,22 +2,22 @@ package parser
 
 import (
 	"fmt"
-	"go-crawler/engine"
+	"go-crawler/common"
 	"regexp"
 )
 
 const teamAjaxRequestRegex = "(n\\.ajax\\({url:\"//)([a-zA-Z0-9&=_/.?]+)(\")"
 
-func ParseIndex(content []byte, _ engine.Context) engine.ParseResult {
+func ParseIndex(content []byte, _ common.Context) common.ParseResult {
 	compiled := regexp.MustCompile(teamAjaxRequestRegex)
 	submatch := compiled.FindSubmatch(content)
 
-	request := engine.Request{
+	request := common.Request{
 		Url:        fmt.Sprintf("https://%s", string(submatch[2])),
 		ParserFunc: parseTeams,
 	}
-	return engine.ParseResult{
-		Requests: []engine.Request{request},
+	return common.ParseResult{
+		Requests: []common.Request{request},
 		Result:   fmt.Sprintf("Find teams ajax request url: %s", request.Url),
 	}
 }

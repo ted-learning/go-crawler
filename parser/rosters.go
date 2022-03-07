@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-crawler/common"
-	"go-crawler/engine"
 	"log"
 )
 
@@ -25,7 +24,7 @@ type Player struct {
 
 const playerDetailsTemp = "https://matchweb.sports.qq.com/player/stats?&callback=playerStats&playerId=%s&from=web"
 
-func parseRosters(content []byte, _ engine.Context) engine.ParseResult {
+func parseRosters(content []byte, _ common.Context) common.ParseResult {
 	rosters := JsonRosters{}
 	err := json.Unmarshal(content, &rosters)
 	common.PanicErr(err)
@@ -34,16 +33,16 @@ func parseRosters(content []byte, _ engine.Context) engine.ParseResult {
 		common.PanicErr(fmt.Errorf("parse roster error, code: %d", rosters.Code))
 	}
 
-	var requests []engine.Request
+	var requests []common.Request
 	for _, v := range rosters.Data {
 		log.Printf("Name: %s, img: %s, ID: %s", v.CnName, v.Logo, v.PlayerId)
-		requests = append(requests, engine.Request{
+		requests = append(requests, common.Request{
 			Url:        fmt.Sprintf(playerDetailsTemp, v.PlayerId),
 			ParserFunc: parsePlayers,
 		})
 	}
 
-	return engine.ParseResult{
+	return common.ParseResult{
 		Requests: requests,
 		Result:   rosters.Data,
 	}

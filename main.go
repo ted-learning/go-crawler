@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-crawler/common"
 	"go-crawler/engine"
 	"go-crawler/parser"
 	"log"
@@ -9,7 +10,7 @@ import (
 
 func main() {
 	s := time.Now()
-	engine.Run(engine.Request{
+	engine.Concurrent{Worker: 100}.Run(common.Request{
 		Url:        "https://nba.stats.qq.com/team/list.htm",
 		ParserFunc: parser.ParseIndex,
 	})
