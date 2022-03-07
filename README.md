@@ -17,4 +17,4 @@ index -> teams -> rosters -> players
 
 ## Concurrence
 
-engine -> scheduler -> workers -> engine
+engine(result chan) -> scheduler(master chan) -> workers(master, result) -> engine
