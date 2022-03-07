@@ -24,8 +24,6 @@ type JsonNBA struct {
 	WestNorth []JsonTeam `json:"westnorth"`
 }
 
-//type JsonTeams []JsonTeam
-
 type JsonTeam struct {
 	Badge            string `json:"badge"`
 	Name             string `json:"name"`
@@ -68,7 +66,9 @@ type Team struct {
 	Link             string
 }
 
-func parseTeams(content []byte, ctx engine.Context) engine.ParseResult {
+const teamLinkTemp = "https://matchweb.sports.qq.com/team/players?teamId=%s&competitionId=100000"
+
+func parseTeams(content []byte, _ engine.Context) engine.ParseResult {
 	jsonNBA := parseJson(content)
 	nba := NBA{
 		East: East{
@@ -87,10 +87,9 @@ func parseTeams(content []byte, ctx engine.Context) engine.ParseResult {
 	}
 	result := engine.ParseResult{Result: nba}
 
-	linkFormat := ctx[linkFormatKey].(string)
 	log.Println("East:")
 	for i, v := range nba.East.Total {
-		v.Link = fmt.Sprintf(linkFormat, v.TeamId)
+		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
 		result.Requests = append(result.Requests, engine.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
@@ -99,7 +98,7 @@ func parseTeams(content []byte, ctx engine.Context) engine.ParseResult {
 	}
 	log.Println("West:")
 	for i, v := range nba.West.Total {
-		v.Link = fmt.Sprintf(linkFormat, v.TeamId)
+		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
 		result.Requests = append(result.Requests, engine.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,

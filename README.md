@@ -10,7 +10,6 @@ go get -u golang.org/x/net/html
 
 ## Flows
 
+main -> engine -> loop(fetcher -> parser)
 
-Parser:
-
-index -> teams -> rosters
+index -> teams -> rosters -> players
