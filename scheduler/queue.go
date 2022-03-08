@@ -22,23 +22,28 @@ func (q *Queue) ConfigWorker(worker common.Worker) {
 }
 
 func (q *Queue) Run() {
-	var workerQ []common.Worker
-	var requestQ []common.Request
-	for {
-		var activeRequest common.Request
-		var activeWorker common.Worker
-		if len(workerQ) > 0 && len(requestQ) > 0 {
-			activeRequest = requestQ[0]
-			activeWorker = workerQ[0]
+	q.requests = make(chan common.Request)
+	q.workers = make(chan common.Worker)
+	go func() {
+		var workerQ []common.Worker
+		var requestQ []common.Request
+		for {
+			var activeRequest common.Request
+			var activeWorker common.Worker
+			if len(workerQ) > 0 && len(requestQ) > 0 {
+				activeRequest = requestQ[0]
+				activeWorker = workerQ[0]
+			}
+			select {
+			case request := <-q.requests:
+				requestQ = append(requestQ, request)
+			case worker := <-q.workers:
+				workerQ = append(workerQ, worker)
+			case activeWorker <- activeRequest:
+				requestQ = requestQ[1:]
+				workerQ = workerQ[1:]
+			}
 		}
-		select {
-		case request := <-q.requests:
-			requestQ = append(requestQ, request)
-		case worker := <-q.workers:
-			workerQ = append(workerQ, worker)
-		case activeWorker <- activeRequest:
-			requestQ = requestQ[1:]
-			workerQ = workerQ[1:]
-		}
-	}
+	}()
+
 }

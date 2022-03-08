@@ -13,9 +13,13 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
+var ticker = time.Tick(10 * time.Millisecond)
+
 func Fetcher(url string) ([]byte, error) {
+	<-ticker
 	log.Printf("Fetching URL %s\n", url)
 	response, err := http.Get(url)
 	if err != nil {
