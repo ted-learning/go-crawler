@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"encoding/json"
 	"go-crawler/common"
 	"go-crawler/fetcher"
 	"log"
@@ -32,11 +31,5 @@ func work(req common.Request) (*common.ParseResult, error) {
 		return nil, err
 	}
 	result := req.ParserFunc(bytes, req.Context)
-	marshal, err := json.Marshal(result.Result)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Printf("Fetched result: %s\n", marshal)
 	return &result, nil
 }

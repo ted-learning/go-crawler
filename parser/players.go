@@ -22,11 +22,12 @@ type JsonStatsItem struct {
 }
 
 type Stats struct {
-	Score   StatsValue
-	Rebound StatsValue
-	Steal   StatsValue
-	Block   StatsValue
-	Assist  StatsValue
+	PlayerId string
+	Score    StatsValue
+	Rebound  StatsValue
+	Steal    StatsValue
+	Block    StatsValue
+	Assist   StatsValue
 }
 
 type StatsValue struct {
@@ -44,12 +45,15 @@ const (
 	Assist  = "助攻"
 )
 
-func parsePlayers(content []byte, _ common.Context) common.ParseResult {
+func parsePlayers(content []byte, context common.Context) common.ParseResult {
 	response := JsonStatsResponse{}
 	err := json.Unmarshal(content, &response)
 	common.PanicErr(err)
 
-	stats := Stats{}
+	stats := Stats{
+		PlayerId: context["playerId"].(string),
+	}
+
 	for _, v := range response.Data.StatsCompare {
 		switch v.Type {
 		case Score:

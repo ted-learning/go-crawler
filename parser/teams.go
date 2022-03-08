@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-crawler/common"
-	"log"
 	"sort"
 	"strconv"
 )
@@ -86,23 +85,20 @@ func parseTeams(content []byte, _ common.Context) common.ParseResult {
 	}
 	result := common.ParseResult{Result: nba}
 
-	log.Println("East:")
-	for i, v := range nba.East.Total {
+	for _, v := range nba.East.Total {
 		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
 		result.Requests = append(result.Requests, common.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
-		log.Printf("%d %v\n", i, v)
 	}
-	log.Println("West:")
-	for i, v := range nba.West.Total {
+
+	for _, v := range nba.West.Total {
 		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
 		result.Requests = append(result.Requests, common.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
-		log.Printf("%d %v\n", i, v)
 	}
 
 	return result

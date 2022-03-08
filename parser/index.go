@@ -18,6 +18,6 @@ func ParseIndex(content []byte, _ common.Context) common.ParseResult {
 	}
 	return common.ParseResult{
 		Requests: []common.Request{request},
-		Result:   fmt.Sprintf("Find teams ajax request url: %s", request.Url),
+		Result:   nil,
 	}
 }

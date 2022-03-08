@@ -8,6 +8,7 @@ import (
 type Concurrent struct {
 	Worker    int
 	Scheduler scheduler.Scheduler
+	SaverChan chan interface{}
 }
 
 func (c Concurrent) Run(seeds ...common.Request) {
@@ -26,6 +27,7 @@ func (c Concurrent) Run(seeds ...common.Request) {
 
 	for {
 		rs := <-result
+		go func() { c.SaverChan <- rs.Result }()
 		for _, seed := range rs.Requests {
 			c.Scheduler.Submit(seed)
 		}
