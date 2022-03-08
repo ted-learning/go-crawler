@@ -6,16 +6,17 @@ import (
 )
 
 type Concurrent struct {
-	Worker int
+	Worker    int
+	Scheduler scheduler.Scheduler
 }
 
 func (c Concurrent) Run(seeds ...common.Request) {
 	master := make(chan common.Request)
 	result := make(chan common.ParseResult)
-	s := scheduler.Simple{Master: master}
 
+	c.Scheduler.ConfigMaster(master)
 	for _, seed := range seeds {
-		s.Submit(seed)
+		c.Scheduler.Submit(seed)
 	}
 
 	for i := 0; i < c.Worker; i++ {
@@ -25,7 +26,7 @@ func (c Concurrent) Run(seeds ...common.Request) {
 	for {
 		rs := <-result
 		for _, seed := range rs.Requests {
-			s.Submit(seed)
+			c.Scheduler.Submit(seed)
 		}
 	}
 }

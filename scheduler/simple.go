@@ -8,6 +8,10 @@ type Simple struct {
 	Master chan common.Request
 }
 
+func (s *Simple) ConfigMaster(master chan common.Request) {
+	s.Master = master
+}
+
 func (s *Simple) Submit(request common.Request) {
 	go func() {
 		s.Master <- request
