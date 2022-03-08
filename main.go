@@ -11,8 +11,9 @@ import (
 
 func main() {
 	s := time.Now()
-	engine.ConcurrentQ{
-		Worker:    100,
+	engine.Concurrent{
+		Worker: 100,
+		//Scheduler: &scheduler.Simple{},
 		Scheduler: &scheduler.Queue{},
 	}.Run(common.Request{
 		Url:        "https://nba.stats.qq.com/team/list.htm",

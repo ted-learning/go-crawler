@@ -5,39 +5,43 @@ import (
 )
 
 type Queue struct {
-	requests chan common.Request
-	workers  chan common.Worker
+	requestChan chan common.Request
+	workerChan  chan chan common.Request
 }
 
-func (q *Queue) ConfigMaster(_ chan common.Request) {
-	panic("implement me")
+func (q *Queue) Notify(workerChan chan common.Request) {
+	q.workerChan <- workerChan
+}
+
+func (q *Queue) GetWorkerChan() chan common.Request {
+	return make(chan common.Request)
 }
 
 func (q *Queue) Submit(request common.Request) {
-	q.requests <- request
+	q.requestChan <- request
 }
 
-func (q *Queue) ConfigWorker(worker common.Worker) {
-	q.workers <- worker
+func (q *Queue) ConfigWorker(worker chan common.Request) {
+	q.workerChan <- worker
 }
 
 func (q *Queue) Run() {
-	q.requests = make(chan common.Request)
-	q.workers = make(chan common.Worker)
+	q.requestChan = make(chan common.Request)
+	q.workerChan = make(chan chan common.Request)
 	go func() {
-		var workerQ []common.Worker
+		var workerQ []chan common.Request
 		var requestQ []common.Request
 		for {
 			var activeRequest common.Request
-			var activeWorker common.Worker
+			var activeWorker chan common.Request
 			if len(workerQ) > 0 && len(requestQ) > 0 {
 				activeRequest = requestQ[0]
 				activeWorker = workerQ[0]
 			}
 			select {
-			case request := <-q.requests:
+			case request := <-q.requestChan:
 				requestQ = append(requestQ, request)
-			case worker := <-q.workers:
+			case worker := <-q.workerChan:
 				workerQ = append(workerQ, worker)
 			case activeWorker <- activeRequest:
 				requestQ = requestQ[1:]

@@ -12,5 +12,3 @@ type ParseResult struct {
 }
 
 type Context map[string]interface{}
-
-type Worker chan Request
