@@ -6,9 +6,9 @@ type Scheduler interface {
 	Submit(request common.Request)
 	GetWorkerChan() chan common.Request
 	Run()
-	Notification
+	Notify
 }
 
-type Notification interface {
-	Notify(workerChan chan common.Request)
+type Notify interface {
+	WorkerReady(workerChan chan common.Request)
 }

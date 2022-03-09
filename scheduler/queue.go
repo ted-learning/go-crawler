@@ -9,7 +9,7 @@ type Queue struct {
 	workerChan  chan chan common.Request
 }
 
-func (q *Queue) Notify(workerChan chan common.Request) {
+func (q *Queue) WorkerReady(workerChan chan common.Request) {
 	q.workerChan <- workerChan
 }
 
@@ -18,11 +18,7 @@ func (q *Queue) GetWorkerChan() chan common.Request {
 }
 
 func (q *Queue) Submit(request common.Request) {
-	q.requestChan <- request
-}
-
-func (q *Queue) ConfigWorker(worker chan common.Request) {
-	q.workerChan <- worker
+	go func() { q.requestChan <- request }()
 }
 
 func (q *Queue) Run() {

@@ -9,12 +9,11 @@ import (
 )
 
 func main() {
-	saverChan := persist.DataSaver()
 	e := engine.Concurrent{
-		Worker: 100,
+		Worker: 200,
 		//Scheduler: &scheduler.Simple{},
 		Scheduler: &scheduler.Queue{},
-		SaverChan: saverChan,
+		SaverChan: persist.DataSaver(),
 	}
 
 	e.Run(common.Request{

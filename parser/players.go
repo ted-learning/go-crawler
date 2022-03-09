@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"go-crawler/common"
+	"log"
 	"strconv"
 )
 
@@ -45,6 +46,8 @@ const (
 	Assist  = "助攻"
 )
 
+var playerStatsCount = 0
+
 func parsePlayers(content []byte, context common.Context) common.ParseResult {
 	response := JsonStatsResponse{}
 	err := json.Unmarshal(content, &response)
@@ -68,6 +71,8 @@ func parsePlayers(content []byte, context common.Context) common.ParseResult {
 			stats.Assist = setValue(&v)
 		}
 	}
+	playerStatsCount++
+	log.Printf("==============player stats count :%d\n", playerStatsCount)
 
 	return common.ParseResult{
 		Result: stats,

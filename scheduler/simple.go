@@ -8,7 +8,7 @@ type Simple struct {
 	Master chan common.Request
 }
 
-func (s *Simple) Notify(_ chan common.Request) {}
+func (s *Simple) WorkerReady(_ chan common.Request) {}
 
 func (s *Simple) Run() {
 	s.Master = make(chan common.Request)

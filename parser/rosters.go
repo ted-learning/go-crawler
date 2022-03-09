@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-crawler/common"
+	"log"
 )
 
 type JsonRosters struct {
@@ -23,6 +24,8 @@ type Player struct {
 
 const playerDetailsTemp = "https://matchweb.sports.qq.com/player/stats?&callback=playerStats&playerId=%s&from=web"
 
+var playerCount = 0
+
 func parseRosters(content []byte, _ common.Context) common.ParseResult {
 	rosters := JsonRosters{}
 	err := json.Unmarshal(content, &rosters)
@@ -34,12 +37,15 @@ func parseRosters(content []byte, _ common.Context) common.ParseResult {
 
 	var requests []common.Request
 	for _, v := range rosters.Data {
+		playerCount++
 		requests = append(requests, common.Request{
 			Url:        fmt.Sprintf(playerDetailsTemp, v.PlayerId),
 			ParserFunc: parsePlayers,
 			Context:    map[string]interface{}{"playerId": v.PlayerId},
 		})
 	}
+
+	log.Printf("==============player count :%d\n", playerCount)
 
 	return common.ParseResult{
 		Requests: requests,
