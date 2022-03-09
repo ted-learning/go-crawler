@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+//goland:noinspection GoUnusedExportedFunction
 func DataSaver() chan interface{} {
 	dataChan := make(chan interface{})
 	client, err := elastic.NewClient(elastic.SetSniff(false))
@@ -18,7 +19,8 @@ func DataSaver() chan interface{} {
 			result := <-dataChan
 			switch data := result.(type) {
 			case parser.NBA:
-				saveNBA(client, data)
+				err := SaveNBA(client, data)
+				common.PanicErr(err)
 				var teams []parser.Team
 				teams = append(teams, data.East.EastSouth...)
 				teams = append(teams, data.East.Atlantic...)
@@ -27,56 +29,71 @@ func DataSaver() chan interface{} {
 				teams = append(teams, data.West.WestSouth...)
 				teams = append(teams, data.West.WestNorth...)
 				for _, v := range teams {
-					saveTeam(client, v)
+					err := SaveTeam(client, v)
+					common.PanicErr(err)
 				}
 			case []parser.Player:
-				savePlayers(client, data)
+				err := SavePlayers(client, data)
+				common.PanicErr(err)
 			case parser.Stats:
-				saveStats(client, data)
+				err := SaveStats(client, data)
+				common.PanicErr(err)
 			}
 		}
 	}()
 	return dataChan
 }
 
-func saveNBA(client *elastic.Client, v parser.NBA) {
+func SaveNBA(client *elastic.Client, v parser.NBA) error {
 	re, err := client.Index().
 		Index("nba").
 		Id("nba").
 		BodyJson(v).
 		Do(context.Background())
-	common.PanicErr(err)
+	if err != nil {
+		return err
+	}
 	log.Println(re)
+	return nil
 }
 
-func saveTeam(client *elastic.Client, v parser.Team) {
+func SaveTeam(client *elastic.Client, v parser.Team) error {
 	re, err := client.Index().
 		Index("team").
 		Id(v.TeamId).
 		BodyJson(v).
 		Do(context.Background())
-	common.PanicErr(err)
+	if err != nil {
+		return err
+	}
 	log.Println(re)
+	return nil
 }
 
-func savePlayers(client *elastic.Client, players []parser.Player) {
+func SavePlayers(client *elastic.Client, players []parser.Player) error {
 	for _, v := range players {
 		re, err := client.Index().
 			Index("player").
 			Id(v.PlayerId).
 			BodyJson(v).
 			Do(context.Background())
-		common.PanicErr(err)
+		if err != nil {
+			return err
+		}
 		log.Println(re)
 	}
+	return nil
 }
 
-func saveStats(client *elastic.Client, v parser.Stats) {
+func SaveStats(client *elastic.Client, v parser.Stats) error {
 	re, err := client.Index().
 		Index("stats").
 		Id(v.PlayerId).
 		BodyJson(v).
 		Do(context.Background())
-	common.PanicErr(err)
+	if err != nil {
+		return err
+	}
 	log.Println(re)
+	return nil
 }
