@@ -60,27 +60,43 @@ type Team struct {
 	Losses           int
 	WiningPercentage int
 	DivRank          int
-	Serial           int
+	Rank             int
 	Link             string
+	Area             string
+	AreaId           int
+	Div              string
+	DivId            int
 }
+
+const (
+	EAST      = 1
+	EASTSOUTH = 11
+	ATLANTIC  = 12
+	CENTRAL   = 13
+	WEST      = 2
+	PACIFIC   = 21
+	WESTSOUTH = 22
+	WESTNORTH = 23
+)
 
 const teamLinkTemp = "https://matchweb.sports.qq.com/team/players?teamId=%s&competitionId=100000"
 
 func parseTeams(content []byte, _ common.Context) common.ParseResult {
 	jsonNBA := parseJson(content)
+	emptyTeams := make([]JsonTeam, 0)
 	nba := NBA{
 		East: East{
-			EastSouth: convertToTeam(&jsonNBA.EastSouth), //东南赛区
-			Central:   convertToTeam(&jsonNBA.Central),   //中部赛区
-			Atlantic:  convertToTeam(&jsonNBA.Atlantic),  //大西洋赛区
-			Total:     convertToTeam(&jsonNBA.East),
+			EastSouth: convertToTeam(&jsonNBA.EastSouth, EAST, EASTSOUTH, &jsonNBA.East),
+			Central:   convertToTeam(&jsonNBA.Central, EAST, CENTRAL, &jsonNBA.East),
+			Atlantic:  convertToTeam(&jsonNBA.Atlantic, EAST, ATLANTIC, &jsonNBA.East),
+			Total:     convertToTeam(&jsonNBA.East, EAST, 0, &emptyTeams),
 		},
 
 		West: West{
-			Pacific:   convertToTeam(&jsonNBA.Pacific),   //太平洋赛区
-			WestNorth: convertToTeam(&jsonNBA.WestNorth), //西北赛区
-			WestSouth: convertToTeam(&jsonNBA.WestSouth), //西南赛区
-			Total:     convertToTeam(&jsonNBA.West),
+			Pacific:   convertToTeam(&jsonNBA.Pacific, WEST, PACIFIC, &jsonNBA.West),
+			WestNorth: convertToTeam(&jsonNBA.WestNorth, WEST, WESTNORTH, &jsonNBA.West),
+			WestSouth: convertToTeam(&jsonNBA.WestSouth, WEST, WESTSOUTH, &jsonNBA.West),
+			Total:     convertToTeam(&jsonNBA.West, WEST, 0, &emptyTeams),
 		},
 	}
 	result := common.ParseResult{Result: nba}
@@ -104,6 +120,42 @@ func parseTeams(content []byte, _ common.Context) common.ParseResult {
 	return result
 }
 
+func findTemRank(team *JsonTeam, total *[]JsonTeam) int {
+	for _, i := range *total {
+		if i.TeamId == team.TeamId {
+			rank, err := strconv.Atoi(i.Serial)
+			common.PanicErr(err)
+			return rank
+		}
+	}
+	rank, err := strconv.Atoi(team.Serial)
+	common.PanicErr(err)
+	return rank
+}
+
+func findAreaName(id int) string {
+	switch id {
+	case EAST:
+		return "东部"
+	case EASTSOUTH:
+		return "东南赛区"
+	case ATLANTIC:
+		return "大西洋赛区"
+	case CENTRAL:
+		return "中部赛区"
+	case WEST:
+		return "西部"
+	case PACIFIC:
+		return "太平洋赛区"
+	case WESTSOUTH:
+		return "西南赛区"
+	case WESTNORTH:
+		return "西北赛区"
+	default:
+		return ""
+	}
+}
+
 func parseJson(content []byte) JsonNBA {
 	var tempMap []interface{}
 	err := json.Unmarshal(content, &tempMap)
@@ -118,7 +170,7 @@ func parseJson(content []byte) JsonNBA {
 	return jsonNBA
 }
 
-func convertToTeam(source *[]JsonTeam) []Team {
+func convertToTeam(source *[]JsonTeam, areaId, divId int, total *[]JsonTeam) []Team {
 	target := make([]Team, len(*source))
 	for i, v := range *source {
 		wins, err := strconv.Atoi(v.Wins)
@@ -130,11 +182,10 @@ func convertToTeam(source *[]JsonTeam) []Team {
 		winingPercentage, err := strconv.Atoi(v.WiningPercentage)
 		common.PanicErr(err)
 
-		rank, err := strconv.Atoi(v.DivRank)
+		divRank, err := strconv.Atoi(v.DivRank)
 		common.PanicErr(err)
 
-		serial, err := strconv.Atoi(v.Serial)
-		common.PanicErr(err)
+		rank := findTemRank(&v, total)
 
 		target[i] = Team{
 			Badge:            v.Badge,
@@ -143,13 +194,17 @@ func convertToTeam(source *[]JsonTeam) []Team {
 			Wins:             wins,
 			Losses:           losses,
 			WiningPercentage: winingPercentage,
-			DivRank:          rank,
-			Serial:           serial,
+			Rank:             rank,
+			Area:             findAreaName(areaId),
+			AreaId:           areaId,
+			Div:              findAreaName(divId),
+			DivId:            divId,
+			DivRank:          divRank,
 		}
 	}
 
 	sort.Slice(target, func(i, j int) bool {
-		return target[i].Serial < target[j].Serial
+		return target[i].Rank < target[j].Rank
 	})
 
 	return target

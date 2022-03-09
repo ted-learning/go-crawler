@@ -1,0 +1,33 @@
+.search-box{
+    margin: 0 auto;
+    width: 100%;
+}
+
+.search-box form{
+    text-align: center;
+}
+
+.search-box form input{
+    width: 500px;
+}
+
+.table-box{
+    margin: 0 auto;
+    width: 100%;
+}
+
+.table{
+    width: 100%;
+    text-align: center;
+}
+
+.table caption{
+    font-size: xx-large;
+    font-weight: bold;
+    margin: 25px;
+}
+
+.table img{
+    width: 150px;
+    height: 150px;
+}

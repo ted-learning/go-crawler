@@ -18,12 +18,15 @@ func DataSaver() chan interface{} {
 			result := <-dataChan
 			switch data := result.(type) {
 			case parser.NBA:
-				log.Println("East:")
-				for _, v := range data.East.Total {
-					saveTeam(client, v)
-				}
-				log.Println("West:")
-				for _, v := range data.West.Total {
+				saveNBA(client, data)
+				var teams []parser.Team
+				teams = append(teams, data.East.EastSouth...)
+				teams = append(teams, data.East.Atlantic...)
+				teams = append(teams, data.East.Central...)
+				teams = append(teams, data.West.Pacific...)
+				teams = append(teams, data.West.WestSouth...)
+				teams = append(teams, data.West.WestNorth...)
+				for _, v := range teams {
 					saveTeam(client, v)
 				}
 			case []parser.Player:
@@ -34,6 +37,16 @@ func DataSaver() chan interface{} {
 		}
 	}()
 	return dataChan
+}
+
+func saveNBA(client *elastic.Client, v parser.NBA) {
+	re, err := client.Index().
+		Index("nba").
+		Id("nba").
+		BodyJson(v).
+		Do(context.Background())
+	common.PanicErr(err)
+	log.Println(re)
 }
 
 func saveTeam(client *elastic.Client, v parser.Team) {

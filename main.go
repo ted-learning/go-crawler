@@ -10,9 +10,9 @@ import (
 
 func main() {
 	e := engine.Concurrent{
-		Worker: 200,
-		//Scheduler: &scheduler.Simple{},
-		Scheduler: &scheduler.Queue{},
+		Worker:    200,
+		Scheduler: &scheduler.Simple{},
+		//Scheduler: &scheduler.Queue{},
 		SaverChan: persist.DataSaver(),
 	}
 

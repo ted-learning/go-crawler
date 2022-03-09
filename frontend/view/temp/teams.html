@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NBA All Teams</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="team">
+    <h2>共为你找到相关结果约为{{.Hits}}个。显示从{{.Start}}起共{{len .Items}}个。</h2>
+    <div class="search-box">
+        <form method="get">
+            <label>
+                <input type="text" value="{{.Query}}" name="q">
+            </label>
+            <button type="submit">搜索</button>
+        </form>
+    </div>
+    <div class="table-box">
+        <!-- Table starts here -->
+        <table id="table" class="table">
+            <caption>球队信息</caption>
+            <tr>
+                <th scope="col">队标</th>
+                <th scope="col">队名</th>
+                <th scope="col">胜率</th>
+                <th scope="col">胜场</th>
+                <th scope="col">败场</th>
+                <th scope="col">排名</th>
+            </tr>
+            {{range .Items}}
+            <tr id="{{.TeamId}}">
+                <td><img src={{.Badge}} alt="{{.TeamId}}"></td>
+                <td>{{.Name}}</td>
+                <td>{{.WiningPercentage}}</td>
+                <td>{{.Wins}}</td>
+                <td>{{.Losses}}</td>
+                <td>{{.Area}}: {{.Rank}}, {{.Div}}: {{.DivRank}}</td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

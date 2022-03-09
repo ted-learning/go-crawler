@@ -13,12 +13,11 @@ type Concurrent struct {
 }
 
 func (c *Concurrent) Run(seeds ...common.Request) {
+	c.Scheduler.Run()
 	c.out = make(chan common.ParseResult)
 	for i := 0; i < c.Worker; i++ {
 		c.createWorker()
 	}
-
-	c.Scheduler.Run()
 	for _, seed := range seeds {
 		c.Scheduler.Submit(seed)
 	}
