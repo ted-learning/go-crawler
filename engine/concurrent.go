@@ -12,23 +12,23 @@ type Concurrent struct {
 	out       chan common.ParseResult
 }
 
-func (c *Concurrent) Run(seeds ...common.Request) {
+func (c *Concurrent) Run() scheduler.Scheduler {
 	c.Scheduler.Run()
 	c.out = make(chan common.ParseResult)
 	for i := 0; i < c.Worker; i++ {
 		c.createWorker()
 	}
-	for _, seed := range seeds {
-		c.Scheduler.Submit(seed)
-	}
 
-	for {
-		rs := <-c.out
-		go func() { c.SaverChan <- rs.Result }()
-		for _, seed := range rs.Requests {
-			c.Scheduler.Submit(seed)
+	go func() {
+		for {
+			rs := <-c.out
+			go func() { c.SaverChan <- rs.Result }()
+			for _, seed := range rs.Requests {
+				c.Scheduler.Submit(seed)
+			}
 		}
-	}
+	}()
+	return c.Scheduler
 }
 
 func (c *Concurrent) createWorker() {

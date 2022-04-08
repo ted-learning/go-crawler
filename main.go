@@ -6,6 +6,7 @@ import (
 	"go-crawler/engine"
 	"go-crawler/parser"
 	"go-crawler/scheduler"
+	"time"
 )
 
 func main() {
@@ -16,8 +17,15 @@ func main() {
 		SaverChan: client.DataSaver(":1234"),
 	}
 
-	e.Run(common.Request{
-		Url:        "https://nba.stats.qq.com/team/list.htm",
-		ParserFunc: parser.ParseIndex,
-	})
+	jobPool := e.Run()
+	jobPool.Submit(
+		common.Request{
+			Url:        "https://nba.stats.qq.com/team/list.htm",
+			ParserFunc: parser.ParseIndex,
+		},
+	)
+
+	for {
+		time.Sleep(time.Duration(1000))
+	}
 }
