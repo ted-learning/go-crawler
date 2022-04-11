@@ -17,6 +17,10 @@ func main() {
 		"frontend/view/temp/teams.html", client,
 	))
 	http.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
+		_, err := http.Get("http://localhost:9200/refresh")
+		if err != nil {
+			return
+		}
 		response := struct {
 			Msg  string `json:"msg"`
 			Code int    `json:"code"`
