@@ -1,6 +1,8 @@
 package scheduler
 
-import "go-crawler/common"
+import (
+	"crawler-engine/common"
+)
 
 type Scheduler interface {
 	Submit(request common.Request)

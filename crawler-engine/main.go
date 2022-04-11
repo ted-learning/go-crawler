@@ -1,11 +1,11 @@
 package main
 
 import (
-	"go-crawler/common"
-	"go-crawler/distribute/persist/client"
-	"go-crawler/engine"
-	"go-crawler/parser"
-	"go-crawler/scheduler"
+	"crawler-engine/common"
+	"crawler-engine/distribute/persist/client"
+	"crawler-engine/engine"
+	"crawler-engine/parser"
+	"crawler-engine/scheduler"
 	"time"
 )
 

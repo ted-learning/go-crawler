@@ -1,9 +1,8 @@
 package client
 
 import (
-	"go-crawler/common"
-	rpcsupport "go-crawler/distribute/rpc"
-	"go-crawler/parser"
+	"crawler-engine/common"
+	"crawler-engine/distribute/rpc"
 )
 
 func DataSaver(host string) chan interface{} {
@@ -16,10 +15,10 @@ func DataSaver(host string) chan interface{} {
 			data := <-dataChan
 			result := ""
 			switch data := data.(type) {
-			case parser.NBA:
+			case common.NBA:
 				err := rpc.Call("DataSaverRpcService.SaveNBA", data, &result)
 				common.PanicErr(err)
-				var teams []parser.Team
+				var teams []common.Team
 				teams = append(teams, data.East.EastSouth...)
 				teams = append(teams, data.East.Atlantic...)
 				teams = append(teams, data.East.Central...)
@@ -30,10 +29,10 @@ func DataSaver(host string) chan interface{} {
 					err := rpc.Call("DataSaverRpcService.SaveTeam", v, &result)
 					common.PanicErr(err)
 				}
-			case []parser.Player:
+			case []common.Player:
 				err := rpc.Call("DataSaverRpcService.SavePlayers", data, &result)
 				common.PanicErr(err)
-			case parser.Stats:
+			case common.Stats:
 				err := rpc.Call("DataSaverRpcService.SaveStats", data, &result)
 				common.PanicErr(err)
 			}

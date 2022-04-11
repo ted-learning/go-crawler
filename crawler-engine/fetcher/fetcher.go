@@ -2,8 +2,8 @@ package fetcher
 
 import (
 	"bufio"
+	"crawler-engine/common"
 	"fmt"
-	"go-crawler/common"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"

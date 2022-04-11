@@ -1,9 +1,9 @@
 package parser
 
 import (
+	common2 "crawler-engine/common"
 	"encoding/json"
 	"fmt"
-	"go-crawler/common"
 	"sort"
 	"strconv"
 )
@@ -21,29 +21,29 @@ const (
 
 const teamLinkTemp = "https://matchweb.sports.qq.com/team/players?teamId=%s&competitionId=100000"
 
-func parseTeams(content []byte, _ common.Context) common.ParseResult {
+func parseTeams(content []byte, _ common2.Context) common2.ParseResult {
 	jsonNBA := parseJson(content)
-	emptyTeams := make([]common.JsonTeam, 0)
-	nba := common.NBA{
-		East: common.East{
+	emptyTeams := make([]common2.JsonTeam, 0)
+	nba := common2.NBA{
+		East: common2.East{
 			EastSouth: convertToTeam(&jsonNBA.EastSouth, EAST, EASTSOUTH, &jsonNBA.East),
 			Central:   convertToTeam(&jsonNBA.Central, EAST, CENTRAL, &jsonNBA.East),
 			Atlantic:  convertToTeam(&jsonNBA.Atlantic, EAST, ATLANTIC, &jsonNBA.East),
 			Total:     convertToTeam(&jsonNBA.East, EAST, 0, &emptyTeams),
 		},
 
-		West: common.West{
+		West: common2.West{
 			Pacific:   convertToTeam(&jsonNBA.Pacific, WEST, PACIFIC, &jsonNBA.West),
 			WestNorth: convertToTeam(&jsonNBA.WestNorth, WEST, WESTNORTH, &jsonNBA.West),
 			WestSouth: convertToTeam(&jsonNBA.WestSouth, WEST, WESTSOUTH, &jsonNBA.West),
 			Total:     convertToTeam(&jsonNBA.West, WEST, 0, &emptyTeams),
 		},
 	}
-	result := common.ParseResult{Result: nba}
+	result := common2.ParseResult{Result: nba}
 
 	for _, v := range nba.East.Total {
 		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
-		result.Requests = append(result.Requests, common.Request{
+		result.Requests = append(result.Requests, common2.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
@@ -51,7 +51,7 @@ func parseTeams(content []byte, _ common.Context) common.ParseResult {
 
 	for _, v := range nba.West.Total {
 		v.Link = fmt.Sprintf(teamLinkTemp, v.TeamId)
-		result.Requests = append(result.Requests, common.Request{
+		result.Requests = append(result.Requests, common2.Request{
 			Url:        v.Link,
 			ParserFunc: parseRosters,
 		})
@@ -60,16 +60,16 @@ func parseTeams(content []byte, _ common.Context) common.ParseResult {
 	return result
 }
 
-func findTemRank(team *common.JsonTeam, total *[]common.JsonTeam) int {
+func findTemRank(team *common2.JsonTeam, total *[]common2.JsonTeam) int {
 	for _, i := range *total {
 		if i.TeamId == team.TeamId {
 			rank, err := strconv.Atoi(i.Serial)
-			common.PanicErr(err)
+			common2.PanicErr(err)
 			return rank
 		}
 	}
 	rank, err := strconv.Atoi(team.Serial)
-	common.PanicErr(err)
+	common2.PanicErr(err)
 	return rank
 }
 
@@ -96,38 +96,38 @@ func findAreaName(id int) string {
 	}
 }
 
-func parseJson(content []byte) common.JsonNBA {
+func parseJson(content []byte) common2.JsonNBA {
 	var tempMap []interface{}
 	err := json.Unmarshal(content, &tempMap)
-	common.PanicErr(err)
+	common2.PanicErr(err)
 
 	marshal, err := json.Marshal(tempMap[1])
-	common.PanicErr(err)
+	common2.PanicErr(err)
 
-	jsonNBA := common.JsonNBA{}
+	jsonNBA := common2.JsonNBA{}
 	err = json.Unmarshal(marshal, &jsonNBA)
-	common.PanicErr(err)
+	common2.PanicErr(err)
 	return jsonNBA
 }
 
-func convertToTeam(source *[]common.JsonTeam, areaId, divId int, total *[]common.JsonTeam) []common.Team {
-	target := make([]common.Team, len(*source))
+func convertToTeam(source *[]common2.JsonTeam, areaId, divId int, total *[]common2.JsonTeam) []common2.Team {
+	target := make([]common2.Team, len(*source))
 	for i, v := range *source {
 		wins, err := strconv.Atoi(v.Wins)
-		common.PanicErr(err)
+		common2.PanicErr(err)
 
 		losses, err := strconv.Atoi(v.Losses)
-		common.PanicErr(err)
+		common2.PanicErr(err)
 
 		winingPercentage, err := strconv.Atoi(v.WiningPercentage)
-		common.PanicErr(err)
+		common2.PanicErr(err)
 
 		divRank, err := strconv.Atoi(v.DivRank)
-		common.PanicErr(err)
+		common2.PanicErr(err)
 
 		rank := findTemRank(&v, total)
 
-		target[i] = common.Team{
+		target[i] = common2.Team{
 			Badge:            v.Badge,
 			Name:             v.Name,
 			TeamId:           v.TeamId,

@@ -1,7 +1,7 @@
 package scheduler
 
 import (
-	"go-crawler/common"
+	"crawler-engine/common"
 )
 
 type Queue struct {

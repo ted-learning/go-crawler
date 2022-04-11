@@ -1,8 +1,8 @@
 package parser
 
 import (
+	common2 "crawler-engine/common"
 	"encoding/json"
-	"go-crawler/common"
 	"strconv"
 )
 
@@ -14,12 +14,12 @@ const (
 	Assist  = "助攻"
 )
 
-func parsePlayers(content []byte, context common.Context) common.ParseResult {
-	response := common.JsonStatsResponse{}
+func parsePlayers(content []byte, context common2.Context) common2.ParseResult {
+	response := common2.JsonStatsResponse{}
 	err := json.Unmarshal(content, &response)
-	common.PanicErr(err)
+	common2.PanicErr(err)
 
-	stats := common.Stats{
+	stats := common2.Stats{
 		PlayerId: context["playerId"].(string),
 	}
 
@@ -38,27 +38,27 @@ func parsePlayers(content []byte, context common.Context) common.ParseResult {
 		}
 	}
 
-	return common.ParseResult{
+	return common2.ParseResult{
 		Result: stats,
 	}
 }
 
-func setValue(v *common.JsonStatsItem) common.StatsValue {
+func setValue(v *common2.JsonStatsItem) common2.StatsValue {
 	value, err := strconv.ParseFloat(v.Value, 64)
-	common.PanicErr(err)
+	common2.PanicErr(err)
 
 	avg, err := strconv.ParseFloat(v.LeagueAvg, 64)
-	common.PanicErr(err)
+	common2.PanicErr(err)
 
 	max, err := strconv.ParseFloat(v.LeagueMax, 64)
-	common.PanicErr(err)
+	common2.PanicErr(err)
 
 	serial, err := strconv.Atoi(v.Serial)
 	if err != nil {
 		serial = -1
 	}
 
-	return common.StatsValue{
+	return common2.StatsValue{
 		Value:     value,
 		LeagueAvg: avg,
 		LeagueMax: max,

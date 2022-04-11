@@ -1,8 +1,8 @@
 package engine
 
 import (
-	"go-crawler/common"
-	"go-crawler/scheduler"
+	"crawler-engine/common"
+	"crawler-engine/scheduler"
 )
 
 type Concurrent struct {

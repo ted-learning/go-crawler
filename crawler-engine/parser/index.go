@@ -1,8 +1,8 @@
 package parser
 
 import (
+	"crawler-engine/common"
 	"fmt"
-	"go-crawler/common"
 	"regexp"
 )
 

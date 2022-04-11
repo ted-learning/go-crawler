@@ -1,8 +1,8 @@
 package engine
 
 import (
-	"go-crawler/common"
-	"go-crawler/fetcher"
+	"crawler-engine/common"
+	"crawler-engine/fetcher"
 	"log"
 )
 
