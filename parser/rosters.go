@@ -6,21 +6,6 @@ import (
 	"go-crawler/common"
 )
 
-type JsonRosters struct {
-	Code int      `json:"code"`
-	Data []Player `json:"data"`
-}
-
-type Player struct {
-	PlayerId  string `json:"playerId"`
-	CnName    string `json:"cnName"`
-	Height    string `json:"height"`
-	Weight    string `json:"weight"`
-	Logo      string `json:"logo"`
-	Position  string `json:"position"`
-	JerseyNum string `json:"jerseyNum"`
-}
-
 const playerDetailsTemp = "https://matchweb.sports.qq.com/player/stats?&callback=playerStats&playerId=%s&from=web"
 
 func parseRosters(content []byte, _ common.Context) common.ParseResult {

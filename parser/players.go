@@ -6,37 +6,6 @@ import (
 	"strconv"
 )
 
-type JsonStatsResponse struct {
-	Code int `json:"code"`
-	Data struct {
-		StatsCompare []JsonStatsItem `json:"statsCompare"`
-	} `json:"data"`
-}
-
-type JsonStatsItem struct {
-	Type      string `json:"type"`
-	Value     string `json:"value"`
-	Serial    string `json:"serial"`
-	LeagueAvg string `json:"leagueAvg"`
-	LeagueMax string `json:"leagueMax"`
-}
-
-type Stats struct {
-	PlayerId string
-	Score    StatsValue
-	Rebound  StatsValue
-	Steal    StatsValue
-	Block    StatsValue
-	Assist   StatsValue
-}
-
-type StatsValue struct {
-	Value     float64
-	LeagueAvg float64
-	LeagueMax float64
-	Serial    int
-}
-
 const (
 	Score   = "得分"
 	Rebound = "篮板"
