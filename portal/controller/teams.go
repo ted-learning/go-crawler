@@ -3,11 +3,10 @@ package controller
 import (
 	"context"
 	"github.com/olivere/elastic/v7"
-	"go-crawler/common"
-	"go-crawler/frontend/model"
-	"go-crawler/frontend/view"
-	"go-crawler/parser"
 	"net/http"
+	"portal/common"
+	"portal/model"
+	"portal/view"
 	"reflect"
 	"regexp"
 	"strings"
@@ -51,7 +50,7 @@ func (s *SearchTeamResultHandler) search(q string) (model.SearchResult, error) {
 	}
 	result.Query = q
 	result.Hits = resp.TotalHits()
-	result.Items = resp.Each(reflect.TypeOf(parser.Team{}))
+	result.Items = resp.Each(reflect.TypeOf(common.Team{}))
 	return result, nil
 }
 

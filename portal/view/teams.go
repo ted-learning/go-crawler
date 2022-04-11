@@ -1,9 +1,9 @@
 package view
 
 import (
-	"go-crawler/frontend/model"
 	"html/template"
 	"net/http"
+	"portal/model"
 )
 
 type TeamResultView struct {
