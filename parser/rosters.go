@@ -9,7 +9,7 @@ import (
 const playerDetailsTemp = "https://matchweb.sports.qq.com/player/stats?&callback=playerStats&playerId=%s&from=web"
 
 func parseRosters(content []byte, _ common.Context) common.ParseResult {
-	rosters := JsonRosters{}
+	rosters := common.JsonRosters{}
 	err := json.Unmarshal(content, &rosters)
 	common.PanicErr(err)
 

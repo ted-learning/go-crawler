@@ -23,16 +23,16 @@ const teamLinkTemp = "https://matchweb.sports.qq.com/team/players?teamId=%s&comp
 
 func parseTeams(content []byte, _ common.Context) common.ParseResult {
 	jsonNBA := parseJson(content)
-	emptyTeams := make([]JsonTeam, 0)
-	nba := NBA{
-		East: East{
+	emptyTeams := make([]common.JsonTeam, 0)
+	nba := common.NBA{
+		East: common.East{
 			EastSouth: convertToTeam(&jsonNBA.EastSouth, EAST, EASTSOUTH, &jsonNBA.East),
 			Central:   convertToTeam(&jsonNBA.Central, EAST, CENTRAL, &jsonNBA.East),
 			Atlantic:  convertToTeam(&jsonNBA.Atlantic, EAST, ATLANTIC, &jsonNBA.East),
 			Total:     convertToTeam(&jsonNBA.East, EAST, 0, &emptyTeams),
 		},
 
-		West: West{
+		West: common.West{
 			Pacific:   convertToTeam(&jsonNBA.Pacific, WEST, PACIFIC, &jsonNBA.West),
 			WestNorth: convertToTeam(&jsonNBA.WestNorth, WEST, WESTNORTH, &jsonNBA.West),
 			WestSouth: convertToTeam(&jsonNBA.WestSouth, WEST, WESTSOUTH, &jsonNBA.West),
@@ -60,7 +60,7 @@ func parseTeams(content []byte, _ common.Context) common.ParseResult {
 	return result
 }
 
-func findTemRank(team *JsonTeam, total *[]JsonTeam) int {
+func findTemRank(team *common.JsonTeam, total *[]common.JsonTeam) int {
 	for _, i := range *total {
 		if i.TeamId == team.TeamId {
 			rank, err := strconv.Atoi(i.Serial)
@@ -96,7 +96,7 @@ func findAreaName(id int) string {
 	}
 }
 
-func parseJson(content []byte) JsonNBA {
+func parseJson(content []byte) common.JsonNBA {
 	var tempMap []interface{}
 	err := json.Unmarshal(content, &tempMap)
 	common.PanicErr(err)
@@ -104,14 +104,14 @@ func parseJson(content []byte) JsonNBA {
 	marshal, err := json.Marshal(tempMap[1])
 	common.PanicErr(err)
 
-	jsonNBA := JsonNBA{}
+	jsonNBA := common.JsonNBA{}
 	err = json.Unmarshal(marshal, &jsonNBA)
 	common.PanicErr(err)
 	return jsonNBA
 }
 
-func convertToTeam(source *[]JsonTeam, areaId, divId int, total *[]JsonTeam) []Team {
-	target := make([]Team, len(*source))
+func convertToTeam(source *[]common.JsonTeam, areaId, divId int, total *[]common.JsonTeam) []common.Team {
+	target := make([]common.Team, len(*source))
 	for i, v := range *source {
 		wins, err := strconv.Atoi(v.Wins)
 		common.PanicErr(err)
@@ -127,7 +127,7 @@ func convertToTeam(source *[]JsonTeam, areaId, divId int, total *[]JsonTeam) []T
 
 		rank := findTemRank(&v, total)
 
-		target[i] = Team{
+		target[i] = common.Team{
 			Badge:            v.Badge,
 			Name:             v.Name,
 			TeamId:           v.TeamId,

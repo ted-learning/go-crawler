@@ -15,11 +15,11 @@ const (
 )
 
 func parsePlayers(content []byte, context common.Context) common.ParseResult {
-	response := JsonStatsResponse{}
+	response := common.JsonStatsResponse{}
 	err := json.Unmarshal(content, &response)
 	common.PanicErr(err)
 
-	stats := Stats{
+	stats := common.Stats{
 		PlayerId: context["playerId"].(string),
 	}
 
@@ -43,7 +43,7 @@ func parsePlayers(content []byte, context common.Context) common.ParseResult {
 	}
 }
 
-func setValue(v *JsonStatsItem) StatsValue {
+func setValue(v *common.JsonStatsItem) common.StatsValue {
 	value, err := strconv.ParseFloat(v.Value, 64)
 	common.PanicErr(err)
 
@@ -58,7 +58,7 @@ func setValue(v *JsonStatsItem) StatsValue {
 		serial = -1
 	}
 
-	return StatsValue{
+	return common.StatsValue{
 		Value:     value,
 		LeagueAvg: avg,
 		LeagueMax: max,
