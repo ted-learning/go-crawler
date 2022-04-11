@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <title>NBA All Teams</title>
     <link rel="stylesheet" href="../css/style.css">
+    <script type="text/javascript" src="../js/ajax.js"></script>
+    <script type="text/javascript">
+        function refresh(){
+            minAjax({
+                url:"/refresh",
+                type:"GET",
+                success: function(data){
+                    alert(data);
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 <div id="team">
@@ -19,8 +31,8 @@
     </div>
     <div class="table-box">
         <!-- Table starts here -->
-        <table id="table" class="table">
-            <caption>球队信息</caption>
+        <table id="table1" class="table">
+            <caption>东部</caption>
             <tr>
                 <th scope="col">队标</th>
                 <th scope="col">队名</th>
@@ -30,7 +42,8 @@
                 <th scope="col">排名</th>
             </tr>
             {{range .Items}}
-            <tr id="{{.TeamId}}">
+            {{if .IsEast}}
+            <tr id="1.{{.TeamId}}">
                 <td><img src={{.Badge}} alt="{{.TeamId}}"></td>
                 <td>{{.Name}}</td>
                 <td>{{.WiningPercentage}}</td>
@@ -39,20 +52,32 @@
                 <td>{{.Area}}: {{.Rank}}, {{.Div}}: {{.DivRank}}</td>
             </tr>
             {{end}}
+            {{end}}
+        </table>
+        <table id="table2" class="table">
+            <caption>西部</caption>
+            <tr>
+                <th scope="col">队标</th>
+                <th scope="col">队名</th>
+                <th scope="col">胜率</th>
+                <th scope="col">胜场</th>
+                <th scope="col">败场</th>
+                <th scope="col">排名</th>
+            </tr>
+            {{range .Items}}
+            {{if .IsWest}}
+            <tr id="2.{{.TeamId}}">
+                <td><img src={{.Badge}} alt="{{.TeamId}}"></td>
+                <td>{{.Name}}</td>
+                <td>{{.WiningPercentage}}%</td>
+                <td>{{.Wins}}</td>
+                <td>{{.Losses}}</td>
+                <td>{{.Area}}: {{.Rank}}, {{.Div}}: {{.DivRank}}</td>
+            </tr>
+            {{end}}
+            {{end}}
         </table>
     </div>
 </div>
 </body>
-<script type="text/javascript" src="../js/ajax.js"></script>
-<script type="text/javascript">
-    function refresh(){
-        minAjax({
-            url:"/refresh",
-            type:"GET",
-            success: function(data){
-                alert(data);
-            }
-        });
-    }
-</script>
 </html>

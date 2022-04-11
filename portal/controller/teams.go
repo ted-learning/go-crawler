@@ -33,24 +33,44 @@ func (s *SearchTeamResultHandler) ServeHTTP(writer http.ResponseWriter, request 
 	common.HandleServerError(writer, err)
 }
 
+type ViewTeam struct {
+	common.Team
+	IsEast bool
+	IsWest bool
+}
+
 func (s *SearchTeamResultHandler) search(q string) (model.SearchResult, error) {
 	var result model.SearchResult
 	search := s.client.Search("team").Size(500)
 	if q != "" {
 		search = search.Query(elastic.NewQueryStringQuery(rewriteQueryString(q)))
 	}
+	result.Query = q
+
 	resp, err := search.
 		SortBy(
 			elastic.NewFieldSort("AreaId"),
 			elastic.NewFieldSort("Rank"),
 		).
 		Do(context.Background())
+
 	if err != nil {
-		return result, err
+		result.Hits = 0
+		result.Items = make([]interface{}, 0)
+	} else {
+		teams := resp.Each(reflect.TypeOf(common.Team{}))
+		result.Hits = resp.TotalHits()
+		result.Items = make([]interface{}, 0)
+
+		for _, team := range teams {
+			t := team.(common.Team)
+			result.Items = append(result.Items, ViewTeam{
+				t,
+				t.Area == "东部",
+				t.Area == "西部",
+			})
+		}
 	}
-	result.Query = q
-	result.Hits = resp.TotalHits()
-	result.Items = resp.Each(reflect.TypeOf(common.Team{}))
 	return result, nil
 }
 

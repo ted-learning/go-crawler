@@ -2,23 +2,36 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/olivere/elastic/v7"
+	"log"
 	"net/http"
+	"os"
 	"portal/common"
 	"portal/controller"
 )
 
 func main() {
-	client, err := elastic.NewClient(elastic.SetSniff(false))
+	esHost := os.Getenv("ElasticHost")
+	if esHost == "" {
+		esHost = "127.0.0.1"
+	}
+	client, err := elastic.NewClient(elastic.SetURL(fmt.Sprintf("http://%s:9200", esHost)), elastic.SetSniff(false))
 	common.PanicErr(err)
 
-	http.Handle("/", http.FileServer(http.Dir("frontend/view")))
+	http.Handle("/", http.FileServer(http.Dir("view")))
 	http.Handle("/team/search", controller.CreateSearchTeamResultHandler(
-		"frontend/view/temp/teams.html", client,
+		"view/temp/teams.html", client,
 	))
+
+	engineHost := os.Getenv("EngineHost")
+	if engineHost == "" {
+		engineHost = "127.0.0.1"
+	}
 	http.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
-		_, err := http.Get("http://localhost:9200/refresh")
+		_, err := http.Post(fmt.Sprintf("http://%s:7500/refresh", engineHost), "application/json", nil)
 		if err != nil {
+			log.Printf(err.Error())
 			return
 		}
 		response := struct {
