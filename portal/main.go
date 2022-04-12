@@ -46,6 +46,15 @@ func main() {
 		err = json.NewEncoder(writer).Encode(response)
 		return
 	})
+
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		_, err := w.Write([]byte("ok"))
+		if err != nil {
+			common.PanicErr(err)
+		}
+	})
+
 	err = http.ListenAndServe(":8888", nil)
 	common.PanicErr(err)
 }

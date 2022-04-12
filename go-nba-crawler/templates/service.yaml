@@ -5,11 +5,16 @@ metadata:
   labels:
     app: go-crawler-elasticsearch-service
 spec:
+  type: NodePort
   ports:
-    - port: 9200
-      targetPort: 9200
-      name: http
+    - name: es-client-svc
+      port: 9200
       protocol: TCP
+      targetPort: esclient
+    - name: es-nodes-svc
+      port: 9300
+      protocol: TCP
+      targetPort: esnodes
   selector:
     app: go-crawler-elasticsearch
 ---
@@ -20,11 +25,12 @@ metadata:
   labels:
     app: go-crawler-data-saver-service
 spec:
+  type: NodePort
   ports:
-    - port: 1234
-      targetPort: 1234
-      name: http
+    - name: go-crawler-data-saver-service
+      port: 1234
       protocol: TCP
+      targetPort: http
   selector:
     app: go-crawler-data-saver
 ---
@@ -35,11 +41,12 @@ metadata:
   labels:
     app: go-crawler-engine-service
 spec:
+  type: NodePort
   ports:
-    - port: 7500
-      targetPort: 7500
-      name: http
+    - name: go-crawler-engine-service
+      port: 7500
       protocol: TCP
+      targetPort: http
   selector:
     app: go-crawler-engine
 ---
@@ -50,10 +57,11 @@ metadata:
   labels:
     app: go-crawler-portal-service
 spec:
+  type: NodePort
   ports:
-    - port: 8888
-      targetPort: 8888
-      name: http
+    - name: go-crawler-portal
+      port: 8888
       protocol: TCP
+      targetPort: http
   selector:
     app: go-crawler-portal

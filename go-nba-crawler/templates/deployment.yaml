@@ -18,14 +18,14 @@ spec:
     spec:
       containers:
         - name: go-crawler-data-saver
-          image: hataketed/go-crawler-data-saver:0.1
+          image: hataketed/go-crawler-data-saver:0.2
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 1234
               protocol: TCP
           env:
-            - name: EngineHost
+            - name: ElasticHost
               valueFrom:
                 configMapKeyRef:
                   name: go-nba-crawler-configmap
@@ -51,7 +51,7 @@ spec:
     spec:
       containers:
         - name: go-crawler-engine
-          image: hataketed/go-crawler-engine:0.1
+          image: hataketed/go-crawler-engine:0.2
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -84,7 +84,7 @@ spec:
     spec:
       containers:
         - name: go-crawler-portal
-          image: hataketed/go-crawler-portal:0.3
+          image: hataketed/go-crawler-portal:0.4
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

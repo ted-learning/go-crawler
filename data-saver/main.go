@@ -6,6 +6,7 @@ import (
 	"data-saver/rpc"
 	"fmt"
 	"github.com/olivere/elastic/v7"
+	"net/http"
 	"os"
 )
 
@@ -20,5 +21,18 @@ func main() {
 	service := &persist.DataSaverRpcService{
 		Client: client,
 	}
+
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		_, err := w.Write([]byte("ok"))
+		if err != nil {
+			common.PanicErr(err)
+		}
+	})
+	err = http.ListenAndServe(":12341", nil)
+	if err != nil {
+		common.PanicErr(err)
+	}
+
 	rpcsupport.ServeRpc(":1234", service)
 }
