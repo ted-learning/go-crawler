@@ -24,6 +24,12 @@ spec:
             - name: http
               containerPort: 1234
               protocol: TCP
+          env:
+            - name: EngineHost
+              valueFrom:
+                configMapKeyRef:
+                  name: go-nba-crawler-configmap
+                  key: ElasticHost
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -51,6 +57,12 @@ spec:
             - name: http
               containerPort: 7500
               protocol: TCP
+          env:
+            - name: DataSaverHost
+              valueFrom:
+                configMapKeyRef:
+                  name: go-nba-crawler-configmap
+                  key: DataSaverHost
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -78,3 +90,14 @@ spec:
             - name: http
               containerPort: 8888
               protocol: TCP
+          env:
+            - name: EngineHost
+              valueFrom:
+                configMapKeyRef:
+                  name: go-nba-crawler-configmap
+                  key: EngineHost
+            - name: ElasticHost
+              valueFrom:
+                configMapKeyRef:
+                  name: go-nba-crawler-configmap
+                  key: ElasticHost
