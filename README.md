@@ -18,3 +18,7 @@ index -> teams -> rosters -> players
 ## Concurrence
 
 engine(result chan) -> scheduler(master chan) -> workers(master, result) -> engine
+
+
+## Helm integrate
+TODO: health check for each service

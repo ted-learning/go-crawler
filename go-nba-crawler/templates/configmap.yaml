@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  myvalue: {{ .Values.myvalue | repeat 2 | upper | quote}}
+  EngineHost: {{ .Values.host.engine | default "127.0.0.1"| quote }}
+  DataSaverHost: {{ .Values.host.dataSaver | quote}}
+  ElasticHost: {{ .Values.host.elastic | quote}}

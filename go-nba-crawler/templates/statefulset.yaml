@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: go-crawler-elasticsearch
+  labels:
+    app: go-crawler-elasticsearch
+spec:
+  selector:
+    matchLabels:
+      app: go-crawler-elasticsearch
+  serviceName: "go-crawler-elasticsearch"
+  replicas: 1
+  minReadySeconds: 3
+  template:
+    metadata:
+      labels:
+        app: go-crawler-elasticsearch
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: go-crawler-elasticsearch
+          image: elasticsearch:7.17.2
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9200
+              protocol: TCP

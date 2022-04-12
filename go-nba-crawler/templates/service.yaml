@@ -1,15 +1,59 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "go-nba-crawler.fullname" . }}
+  name: {{ .Values.host.elastic }}
   labels:
-    {{- include "go-nba-crawler.labels" . | nindent 4 }}
+    app: go-crawler-elasticsearch-service
 spec:
-  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
+    - port: 9200
+      targetPort: 9200
       name: http
+      protocol: TCP
   selector:
-    {{- include "go-nba-crawler.selectorLabels" . | nindent 4 }}
+    app: go-crawler-elasticsearch
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.host.dataSaver }}
+  labels:
+    app: go-crawler-data-saver-service
+spec:
+  ports:
+    - port: 1234
+      targetPort: 1234
+      name: http
+      protocol: TCP
+  selector:
+    app: go-crawler-data-saver
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.host.engine }}
+  labels:
+    app: go-crawler-engine-service
+spec:
+  ports:
+    - port: 7500
+      targetPort: 7500
+      name: http
+      protocol: TCP
+  selector:
+    app: go-crawler-engine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-crawler-portal
+  labels:
+    app: go-crawler-portal-service
+spec:
+  ports:
+    - port: 8888
+      targetPort: 8888
+      name: http
+      protocol: TCP
+  selector:
+    app: go-crawler-portal

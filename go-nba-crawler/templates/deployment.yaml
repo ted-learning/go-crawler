@@ -1,61 +1,80 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "go-nba-crawler.fullname" . }}
+  name: go-crawler-data-saver
   labels:
-    {{- include "go-nba-crawler.labels" . | nindent 4 }}
+    app: go-crawler-data-saver
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.autoscaling.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "go-nba-crawler.selectorLabels" . | nindent 6 }}
+      app: go-crawler-data-saver
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "go-nba-crawler.selectorLabels" . | nindent 8 }}
+        app: go-crawler-data-saver
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "go-nba-crawler.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        - name: go-crawler-data-saver
+          image: hataketed/go-crawler-data-saver:0.1
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 1234
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-crawler-engine
+  labels:
+    app: go-crawler-engine
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.autoscaling.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: go-crawler-engine
+  template:
+    metadata:
+      labels:
+        app: go-crawler-engine
+    spec:
+      containers:
+        - name: go-crawler-engine
+          image: hataketed/go-crawler-engine:0.1
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 7500
+              protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-crawler-portal
+  labels:
+    app: go-crawler-portal
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.autoscaling.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: go-crawler-portal
+  template:
+    metadata:
+      labels:
+        app: go-crawler-portal
+    spec:
+      containers:
+        - name: go-crawler-portal
+          image: hataketed/go-crawler-portal:0.3
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8888
+              protocol: TCP
